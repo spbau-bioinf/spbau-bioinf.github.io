@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+{%- comment -%}
+  Общий шаблон всех страниц. Меню берётся из _data/nav.yml,
+  кнопки «Предыдущая / Следующая» считаются по порядку страниц в меню.
+{%- endcomment -%}
+{%- assign work = site.data.nav | where: "work", page.work | first -%}
+{%- assign here = page.url | remove_first: "/" -%}
+{%- if here == "" -%}{%- assign here = "index.html" -%}{%- endif -%}
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.head_title %}{{ page.head_title }}{% else %}{{ page.code | capitalize }}. {{ page.title | strip_html }}{% endif %} | {{ site.title }}</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/markdown.css">
+</head>
+<body>
+  <a class="skip-link" href="#content">Перейти к содержанию</a>
+
+  <div class="layout">
+
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <p class="sidebar__brand-title">{{ site.brand_title }}</p>
+        <p class="sidebar__brand-sub">{{ site.brand_sub }}</p>
+      </div>
+      <details class="menu-panel" open>
+{%- if work %}
+        <summary class="menu-panel__summary">Страницы работы</summary>
+        <nav class="menu" aria-label="Страницы практической работы {{ work.work }}">
+          <ul class="menu__list">
+{%- for item in work.pages %}
+            <li class="menu__item{% unless forloop.first %} menu__item--sub{% endunless %}{% if item.extra %} menu__item--extra{% endif %}">
+              <a class="menu__link{% if item.url == here %} menu__link--current{% endif %}" href="{{ item.url }}"{% if item.url == here %} aria-current="page"{% endif %}>
+                <span class="menu__code">{{ item.code }}</span>
+                <span class="menu__title">{{ item.title }}</span>
+              </a>
+            </li>
+{%- endfor %}
+          </ul>
+        </nav>
+{%- else %}
+        <summary class="menu-panel__summary">Практические работы</summary>
+        <nav class="menu" aria-label="Практические работы">
+          <ul class="menu__list">
+{%- for w in site.data.nav %}
+            <li class="menu__item">
+              <a class="menu__link" href="{{ w.pages[0].url }}">
+                <span class="menu__code">{{ w.pages[0].code }}</span>
+                <span class="menu__title">{{ w.title }}</span>
+              </a>
+            </li>
+{%- endfor %}
+          </ul>
+        </nav>
+{%- endif %}
+      </details>
+    </aside>
+
+    <div class="page">
+      <header class="page-header">
+        <p class="page-header__kicker">{% if page.kicker %}{{ page.kicker }}{% else %}{{ work.title }} · {{ page.code }}{% endif %}</p>
+        <h1 class="page-header__title">{{ page.title }}</h1>
+      </header>
+
+      <main id="content" class="content">
+{%- comment -%}
+  Обработка текста страницы:
+  1) каждая таблица оборачивается в прокручиваемый блок;
+  2) текст между @@ и @@ выделяется (ввод пользователя / новая папка).
+{%- endcomment -%}
+{%- assign html = content | replace: "<table", '<div class="table-scroll"><table' | replace: "</table>", "</table></div>" -%}
+{%- assign parts = html | split: "@@" -%}
+{%- for part in parts -%}
+  {%- assign odd = forloop.index0 | modulo: 2 -%}
+  {%- if odd == 1 -%}<span class="user-input">{{ part }}</span>{%- else -%}{{ part }}{%- endif -%}
+{%- endfor %}
+
+{%- unless page.show_author == false %}
+        <p class="author">{{ site.author }}</p>
+{%- endunless %}
+
+{%- if work %}
+  {%- for item in work.pages -%}
+    {%- if item.url == here -%}
+      {%- assign prev_i = forloop.index0 | minus: 1 -%}
+      {%- assign next_i = forloop.index0 | plus: 1 -%}
+      {%- assign is_first = forloop.first -%}
+      {%- assign is_last = forloop.last -%}
+    {%- endif -%}
+  {%- endfor %}
+
+        <nav class="pager" aria-label="Переход между страницами">
+{%- unless is_first %}
+          <a class="btn btn--prev" href="{{ work.pages[prev_i].url }}">&lt; Предыдущая страница</a>
+{%- endunless %}
+{%- unless is_last %}
+          <a class="btn btn--next" href="{{ work.pages[next_i].url }}">Следующая страница &gt;</a>
+{%- endunless %}
+        </nav>
+{%- endif %}
+
+      </main>
+
+      <footer class="site-footer">
+{%- for line in site.footer %}
+        <p class="site-footer__line">{{ line }}</p>
+{%- endfor %}
+      </footer>
+    </div>
+
+  </div>
+</body>
+</html>

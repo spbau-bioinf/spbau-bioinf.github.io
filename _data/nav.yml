@@ -1,0 +1,38 @@
+- work: 1
+  title: "Практическое занятие #1"
+  pages:
+    - url: task_1.html
+      code: "task 1"
+      title: "Практическое занятие #1: навигация"
+    - url: task_1-0.html
+      code: "task 1-0"
+      title: "Программа, алгоритм, интерпретатор"
+    - url: task_1-1.html
+      code: "task 1-1"
+      title: "Экосистема Python и её место в биоинформатике"
+    - url: task_1-2.html
+      code: "task 1-2"
+      title: "Интегрированная среда разработки, файл .py, запуск программы из командной строки"
+    - url: task_1-3.html
+      code: "task 1-3"
+      title: "Переменные, объекты, ссылочная модель"
+    - url: task_1-4.html
+      code: "task 1-4"
+      title: "Встроенные типы: <code>int</code>, <code>float</code>, <code>bool</code>, <code>str</code>"
+    - url: task_1-5.html
+      code: "task 1-5"
+      title: "Арифметические операции, особенности вещественной арифметики и точность вычислений (Часть 1)"
+    - url: task_1-6.html
+      code: "task 1-6"
+      title: "Арифметические операции, особенности вещественной арифметики и точность вычислений (Часть 2)"
+    - url: task_1-7.html
+      code: "task 1-7"
+      title: "Функции <code>print()</code> и <code>input()</code>"
+    - url: task_1-8.html
+      code: "task 1-8"
+      title: "Представление биологических данных в программе"
+    - url: task_1-9.html
+      code: "task 1-9"
+      title: "Общее итоговое задание (самостоятельная работа)"
+      extra: true
+      tag: "итог"
