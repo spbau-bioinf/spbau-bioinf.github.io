@@ -23,7 +23,7 @@ home:
       url: "#works"
       icon: book
     - title: "GitHub"
-      url: "https://github.com/chiroot/python-practice"
+      url: "https://github.com/spbau-bioinf/spbau-bioinf.github.io"
       icon: code
     # - title: "Telegram"
     #   url: "https://t.me/..."
@@ -33,7 +33,7 @@ home:
     - title: "Занятия"
       url: "#works"
     - title: "GitHub"
-      url: "https://github.com/chiroot/python-practice"
+      url: "https://github.com/spbau-bioinf/spbau-bioinf.github.io"
   works_title: "Практические занятия"
 
 # Подпись в конце страниц (отключается в странице: show_author: false)
