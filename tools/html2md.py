@@ -6,7 +6,7 @@
     python tools/html2md.py <папка_с_html> [--site .]
 
 Что делает:
-  * для каждого task_N*.html создаёт task_N*.md рядом с _config.yml;
+  * для каждого task_N*.html создаёт task_N/task_N*.md;
   * боковое меню, шапку, подвал, кнопки «Предыдущая / Следующая» и подпись
     автора убирает — их рисует шаблон _layouts/default.html;
   * меню занятия записывает (или обновляет) в _data/nav.yml.
@@ -398,6 +398,7 @@ def convert_page(path: Path, work: int, work_title: str, site_title: str):
 
 
 def read_nav(path: Path, work: int):
+    folder = f"task_{work}/"
     soup = BeautifulSoup(path.read_text(encoding="utf-8"), "lxml")
     tags = {}
     for item in soup.select(".toc__item"):
@@ -409,7 +410,7 @@ def read_nav(path: Path, work: int):
     for li in soup.select(".menu__item"):
         a = li.select_one(".menu__link")
         entry = {
-            "url": a["href"],
+            "url": folder + a["href"],
             "code": a.select_one(".menu__code").get_text(strip=True),
             "title": page_inner_html(a.select_one(".menu__title")),
         }
@@ -417,21 +418,38 @@ def read_nav(path: Path, work: int):
             entry["extra"] = True
         if a["href"] in tags:
             entry["tag"] = tags[a["href"]]
+        if not pages:
+            entry["menu_title"] = "Навигация по занятию"
         pages.append(entry)
     return pages
 
 
-def nav_yaml(work: int, work_title: str, pages) -> str:
-    lines = [f"- work: {work}", f"  title: {yaml_str(work_title)}", "  pages:"]
+def nav_yaml(work: int, work_title: str, pages, extra_lines=()) -> str:
+    lines = [f"- work: {work}", f"  title: {yaml_str(work_title)}"]
+    lines += list(extra_lines)
+    lines.append("  pages:")
     for p in pages:
         lines.append(f"    - url: {p['url']}")
         lines.append(f"      code: {yaml_str(p['code'])}")
         lines.append(f"      title: {yaml_str(p['title'])}")
+        if p.get("menu_title"):
+            lines.append(f"      menu_title: {yaml_str(p['menu_title'])}")
         if p.get("extra"):
             lines.append("      extra: true")
         if p.get("tag"):
             lines.append(f"      tag: {yaml_str(p['tag'])}")
     return "\n".join(lines) + "\n"
+
+
+def work_extra_lines(nav_file: Path, work: int):
+    """Поля занятия, заданные вручную (description, tags, image…), сохраняются."""
+    if not nav_file.exists():
+        return []
+    for chunk in re.split(r"(?m)^(?=- work: )", nav_file.read_text(encoding="utf-8")):
+        if chunk.startswith(f"- work: {work}\n"):
+            head = chunk.split("\n  pages:")[0].splitlines()[1:]
+            return [l for l in head if not l.startswith("  title:")]
+    return []
 
 
 def update_nav_file(nav_file: Path, work: int, block_text: str):
@@ -470,17 +488,21 @@ def main():
     kicker = BeautifulSoup(sub.read_text(encoding="utf-8"), "lxml").select_one(".page-header__kicker")
     work_title = kicker.get_text(strip=True).split(" · ")[0]
 
+    out_dir = site / f"task_{work}"
+    out_dir.mkdir(exist_ok=True)
     for f in files:
         md, fallbacks = convert_page(f, work, work_title, site_title)
-        (site / f.with_suffix(".md").name).write_text(md, encoding="utf-8")
+        (out_dir / f.with_suffix(".md").name).write_text(md, encoding="utf-8")
         note = f" (оставлено HTML: {len(fallbacks)})" if fallbacks else ""
-        print(f"{f.name} -> {f.with_suffix('.md').name}{note}")
+        print(f"{f.name} -> {out_dir.name}/{f.with_suffix('.md').name}{note}")
         for fb in fallbacks:
             print("   ·", fb)
 
     nav_dir = site / "_data"
     nav_dir.mkdir(exist_ok=True)
-    update_nav_file(nav_dir / "nav.yml", work, nav_yaml(work, work_title, read_nav(hub, work)))
+    nav_file = nav_dir / "nav.yml"
+    extra = work_extra_lines(nav_file, work)
+    update_nav_file(nav_file, work, nav_yaml(work, work_title, read_nav(hub, work), extra))
     print(f"_data/nav.yml: меню занятия {work} обновлено")
 
 

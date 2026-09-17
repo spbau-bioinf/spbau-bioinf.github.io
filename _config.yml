@@ -9,6 +9,33 @@ title: "Язык программирования Python"
 brand_title: "PYTHON · 2026"
 brand_sub: "Язык программирования Python<br>Профиль «Биоинформатика»"
 
+# Главная страница
+home:
+  # картинка в кружке, например assets/img/avatar.png; пусто — значок emoji
+  avatar: ""
+  emoji: "🐍"
+  title: "Язык программирования Python"
+  subtitle: "Профиль «Биоинформатика» · СПбАУ РАН им. Ж. И. Алферова"
+  intro: "Теория, разобранные примеры и задания к практическим занятиям. За семестр шаг за шагом собираем сквозной проект «Анализ биологических последовательностей»."
+  # кнопки под описанием; icon: code, chat, mail, play, book или link
+  links:
+    - title: "Занятия"
+      url: "#works"
+      icon: book
+    - title: "GitHub"
+      url: "https://github.com/chiroot/python-practice"
+      icon: code
+    # - title: "Telegram"
+    #   url: "https://t.me/..."
+    #   icon: chat
+  # ссылки в верхней строке
+  topnav:
+    - title: "Занятия"
+      url: "#works"
+    - title: "GitHub"
+      url: "https://github.com/chiroot/python-practice"
+  works_title: "Практические занятия"
+
 # Подпись в конце страниц (отключается в странице: show_author: false)
 author: "Подготовил: Ерофеев А.И."
 
